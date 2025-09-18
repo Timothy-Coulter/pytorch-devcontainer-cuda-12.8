@@ -16,7 +16,10 @@ What you get
 - `uv` package manager, strict typing (mypy), ruff/black/isort
 - Useful caches mounted as volumes (pip, uv, torch, huggingface)
 - GPU-enabled run args: `--gpus all --ipc host`
- - JupyterLab auto-starts on port 8888 (no token)
+- JupyterLab auto-starts on port 8888 (no token)
+- TensorBoard auto-starts on port 6006
+- VizTracer installed and VS Code extension preloaded
+- Ruff pydocstyle configured for Google docstrings
 
 Repo Layout
 -----------
@@ -40,6 +43,10 @@ When the container starts, it automatically runs:
 - `uv venv --system-site-packages` (so the venv inherits system packages)
 - `uv sync --extra dev` (installs project + dev tooling, but never PyTorch)
 - JupyterLab on `http://localhost:8888` (no token)
+- TensorBoard on `http://localhost:6006` (logdir: `./runs`)
+
+Build-time optimization:
+- The Dockerfile now runs `uv venv --system-site-packages && uv sync --extra dev` at the end of the image build to pre-warm dependency resolution and downloads. Post-create still runs the same commands to ensure the workspace venv is ready on first boot.
 
 Check versions:
 - `./dev.sh versions`
@@ -86,6 +93,16 @@ If you prefer the Dev Container CLI instead of VS Code UI:
   - `npx -y @devcontainers/cli up --workspace-folder .`
 
 The CLI requires Docker and access to `nvcr.io` (ensure `docker login nvcr.io`).
+
+Profiling with VizTracer
+------------------------
+- VizTracer is included in the `dev` extra and the VS Code extension is preinstalled.
+- From VS Code: use the VizTracer commands (e.g., “VizTracer: Start Tracing”).
+- From terminal: `viztracer your_script.py` then open the generated report.
+
+Docstrings Style
+----------------
+- Ruff’s pydocstyle rules are enabled with the Google convention. Write docstrings in Google style and run `./dev.sh lint` to check.
 
 Notes
 -----

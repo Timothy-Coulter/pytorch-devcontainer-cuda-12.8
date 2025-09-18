@@ -46,6 +46,8 @@ dev = [
   "pytest>=8.3",
   "pytest-xdist>=3.6",
   "pytest-rerunfailures>=14.0",
+  # Profiling / tracing
+  "viztracer>=0.16",
 ]
 
 ## PyTorch is preinstalled in the base image and intentionally omitted
@@ -78,11 +80,15 @@ select = [
   "UP", # pyupgrade
   "B",  # flake8-bugbear
   "SIM",# flake8-simplify
-  "C90" # mccabe complexity
+  "C90",# mccabe complexity
+  "D",  # pydocstyle (docstrings)
 ]
 ignore = [
   "E501",  # handled by formatter
 ]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.ruff.format]
 quote-style = "preserve"

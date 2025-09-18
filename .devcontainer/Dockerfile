@@ -72,5 +72,17 @@ WORKDIR /workspaces
 # Helpful defaults inside the container
 ENV PATH=/home/${USERNAME}/.local/bin:$PATH
 
+# Pre-warm Python environment with uv at the end of the build
+# This leverages Docker layer caching to speed up first container start.
+# Note: The devcontainer mounts caches as named volumes at runtime; this
+# primarily benefits image build caching and may still reduce sync time.
+WORKDIR /tmp/project-bootstrap
+COPY --chown=${USERNAME}:${USERNAME} pyproject.toml uv.lock ./
+RUN uv venv --system-site-packages \
+    && uv sync --extra dev
+
+# Return to the default workspace
+WORKDIR /workspaces
+
 # nvidia-container-toolkit will inject GPUs when run with `--gpus all`.
 CMD ["bash"]
