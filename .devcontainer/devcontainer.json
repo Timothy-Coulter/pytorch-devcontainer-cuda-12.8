@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
+  "name": "PyTorch 25.08 DevContainer",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "runArgs": ["--gpus=all", "--ipc=host"],
+  "containerUser": "vscode",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "forwardPorts": [8888],
+  "portsAttributes": {
+    "8888": {
+      "label": "Jupyter Lab",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "mounts": [
+    // Caches (named volumes for speed & persistence)
+    "type=volume,source=${localWorkspaceFolderBasename}-pip-cache,target=/home/vscode/.cache/pip",
+    "type=volume,source=${localWorkspaceFolderBasename}-uv-cache,target=/home/vscode/.cache/uv",
+    "type=volume,source=${localWorkspaceFolderBasename}-torch-cache,target=/home/vscode/.cache/torch",
+    "type=volume,source=${localWorkspaceFolderBasename}-hf-cache,target=/home/vscode/.cache/huggingface",
+    // Data & datasets
+    "type=bind,source=${localWorkspaceFolder}/datasets,target=/workspaces/${localWorkspaceFolderBasename}/datasets",
+    "type=volume,source=${localWorkspaceFolderBasename}-data,target=/workspaces/${localWorkspaceFolderBasename}/data"
+  ],
+  "containerEnv": {
+    "NVIDIA_VISIBLE_DEVICES": "all",
+    "NVIDIA_DRIVER_CAPABILITIES": "compute,utility"
+  },
+  "remoteEnv": {
+    "HF_HOME": "/home/vscode/.cache/huggingface",
+    "TORCH_HOME": "/home/vscode/.cache/torch",
+    "PIP_CACHE_DIR": "/home/vscode/.cache/pip"
+  },
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "ms-toolsai.jupyter"
+      ]
+    }
+  },
+  "postCreateCommand": "bash -lc 'chmod +x /workspaces/${localWorkspaceFolderBasename}/dev.sh && mkdir -p src tests misc examples docs datasets && uv venv --system-site-packages && uv sync --extra dev'",
+  "postStartCommand": "bash -lc 'if [ -d .venv ]; then . .venv/bin/activate; fi; nohup jupyter lab --ServerApp.token=\"\" --ServerApp.password=\"\" --ip=0.0.0.0 --port=8888 --no-browser > /home/vscode/.jupyter.log 2>&1 & sleep 1'"
+}
