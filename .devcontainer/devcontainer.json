@@ -1,11 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
   "name": "PyTorch 25.08 DevContainer",
+  "initializeCommand": "bash -lc 'mkdir -p .devcontainer; if [ -f \"$HOME/.env\" ]; then cp \"$HOME/.env\" .devcontainer/.env.devcontainer; else : > .devcontainer/.env.devcontainer; fi'",
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."
   },
-  "runArgs": ["--gpus=all", "--ipc=host"],
+  "runArgs": [
+    "--gpus=all",
+    "--ipc=host",
+    "--env-file",
+    "${localWorkspaceFolder}/.devcontainer/.env.devcontainer"
+  ],
   "containerUser": "vscode",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "forwardPorts": [8888, 6006],

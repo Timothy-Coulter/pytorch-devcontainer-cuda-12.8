@@ -45,8 +45,8 @@ case "$cmd" in
     mypy .
     ;;
   test)
-    echo "[test] pytest -n auto --reruns 2"
-    pytest -n auto --reruns 2
+    echo "[test] pytest (uses pyproject addopts)"
+    pytest
     ;;
   versions)
     echo "[versions] Python, torch, CUDA"

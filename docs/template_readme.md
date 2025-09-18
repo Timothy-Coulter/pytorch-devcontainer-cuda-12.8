@@ -9,6 +9,7 @@ Prerequisites
 - NVIDIA GPU drivers + NVIDIA Container Toolkit (for GPU access)
 - Access to NGC: `docker login nvcr.io` with your NGC API key
 - VS Code + Dev Containers extension (or GitHub Codespaces)
+ - Optional: host `~/.env` file with API keys and env vars (see below)
 
 What you get
 ------------
@@ -73,6 +74,30 @@ Data and Caches
 - Caches are persisted via named volumes: pip, uv, torch, huggingface
 - Local datasets folder is bind-mounted into `/workspaces/<repo>/datasets`
 - Add your own data under `datasets/` or use the mounted `data/` volume
+
+Environment Variables (.env)
+----------------------------
+- If you have a `~/.env` on your host, the devcontainer will detect it and pass all variables into the container at start using Docker’s `--env-file`.
+- Nothing to configure: it is copied (or an empty file is created) via `initializeCommand` to `.devcontainer/.env.devcontainer` and automatically applied on `docker run`.
+- The file `.devcontainer/.env.devcontainer` is git-ignored.
+
+Format and usage
+- File path: `~/.env` on your host machine.
+- Format: simple KEY=VALUE lines; blank lines and `#` comments allowed.
+  - Example:
+    - `OPENAI_API_KEY=sk-...`
+    - `WANDB_API_KEY=...`
+    - `HF_TOKEN=...`
+- No `export` statements; quotes are preserved as part of the value; no shell expansion.
+- In code and notebooks, read values from `os.environ["KEY"]` (already in the process env).
+
+Updating variables
+- If you change `~/.env`, run “Dev Containers: Rebuild Container” (or `devcontainer up --workspace-folder .`) to re-sync and apply changes.
+- Alternatively, edit `.devcontainer/.env.devcontainer` directly in the workspace and rebuild to apply.
+
+Notes and security
+- `.devcontainer/.env.devcontainer` exists on disk inside the repo folder and is ignored by Git; avoid committing secrets elsewhere.
+- For shared/team use, prefer per-user `~/.env` rather than committing any env files to the repo.
 
 Developer Commands
 ------------------
