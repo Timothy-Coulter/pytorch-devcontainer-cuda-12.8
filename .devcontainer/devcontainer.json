@@ -21,8 +21,8 @@
     "type=volume,source=${localWorkspaceFolderBasename}-uv-cache,target=/home/vscode/.cache/uv",
     "type=volume,source=${localWorkspaceFolderBasename}-torch-cache,target=/home/vscode/.cache/torch",
     "type=volume,source=${localWorkspaceFolderBasename}-hf-cache,target=/home/vscode/.cache/huggingface",
-    // Data & datasets
-    "type=bind,source=${localWorkspaceFolder}/datasets,target=/workspaces/${localWorkspaceFolderBasename}/datasets",
+    // Data & datasets (use volumes by default so Clone-in-Container-Volume works)
+    "type=volume,source=${localWorkspaceFolderBasename}-datasets,target=/workspaces/${localWorkspaceFolderBasename}/datasets",
     "type=volume,source=${localWorkspaceFolderBasename}-data,target=/workspaces/${localWorkspaceFolderBasename}/data"
   ],
   "containerEnv": {
