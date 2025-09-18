@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-usage() {
+  usage() {
   cat <<'USAGE'
 dev.sh <command>
 
@@ -13,6 +13,7 @@ Commands:
   test         Run pytest with xdist + reruns
   all-checks   Format, lint-fix, typecheck, then tests
   versions     Print Python, Torch, and CUDA info
+  clean        Remove caches and build artifacts
 
 Examples:
   ./dev.sh all-checks
@@ -25,7 +26,7 @@ if [[ -z "$cmd" ]]; then
   exit 1
 fi
 
-case "$cmd" in
+  case "$cmd" in
   format)
     echo "[format] ruff format, black, isort"
     ruff format .
@@ -70,6 +71,18 @@ try:
 except Exception as e:
     print("torch import failed:", e)
 PY
+    ;;
+  clean)
+    echo "[clean] removing build and tool caches"
+    rm -rf \
+      .mypy_cache \
+      .pytest_cache \
+      .ruff_cache \
+      .cache \
+      build \
+      dist \
+      src/*.egg-info \
+      **/__pycache__ 2>/dev/null || true
     ;;
   all-checks)
     "$0" format

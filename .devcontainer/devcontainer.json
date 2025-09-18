@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
-  "name": "PyTorch 25.08 DevContainer",
+  "name": "PyTorch DevContainer — NGC 25.08",
   "initializeCommand": "bash -lc 'mkdir -p .devcontainer; if [ -f \"$HOME/.env\" ]; then cp \"$HOME/.env\" .devcontainer/.env.devcontainer; else : > .devcontainer/.env.devcontainer; fi'",
   "build": {
     "dockerfile": "Dockerfile",
@@ -9,6 +9,10 @@
   "runArgs": [
     "--gpus=all",
     "--ipc=host",
+    "--init",
+    "--shm-size=16g",
+    "--ulimit",
+    "memlock=-1",
     "--env-file",
     "${localWorkspaceFolder}/.devcontainer/.env.devcontainer"
   ],
@@ -42,7 +46,8 @@
   "remoteEnv": {
     "HF_HOME": "/home/vscode/.cache/huggingface",
     "TORCH_HOME": "/home/vscode/.cache/torch",
-    "PIP_CACHE_DIR": "/home/vscode/.cache/pip"
+    "PIP_CACHE_DIR": "/home/vscode/.cache/pip",
+    "UV_CACHE_DIR": "/home/vscode/.cache/uv"
   },
   "features": {},
   "customizations": {
@@ -52,8 +57,6 @@
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
         "ms-toolsai.jupyter",
-        "openai.chatgpt",
-        "RooVeterinaryInc.roo-cline",
         "gaogaotiantian.viztracer-vscode"
       ]
     }

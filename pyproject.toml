@@ -11,10 +11,12 @@ authors = [
 
 # Core ML/DL/data packages — PyTorch is installed in the image (not here)
 dependencies = [
-  "numpy>=1.26",
-  "pandas>=2.2",
-  "scikit-learn>=1.5",
-  "scipy>=1.13",
+  # Torch in nvcr.io/nvidia/pytorch:25.08 is built against NumPy 1.x
+  # Keep NumPy <2 to avoid ABI/runtime incompatibilities inside this image.
+  "numpy>=1.26,<2",
+  "pandas>=2.2,<2.3",
+  "scikit-learn>=1.5,<1.7",
+  "scipy>=1.13,<1.16",
   "matplotlib>=3.9",
   "seaborn>=0.13",
   "plotly>=5.24",
@@ -113,4 +115,4 @@ warn_required_dynamic_aliases = true
 
 [tool.pytest.ini_options]
 addopts = ["-n", "auto", "--reruns", "3"]
-testpaths = ["unit_tests"]
+testpaths = ["tests"]

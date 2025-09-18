@@ -44,9 +44,11 @@ RUN set -eux; \
 
 # Use Python and PyTorch that ship with the base image (likely via /opt/conda)
 
-# Install uv (fast Python package/deps manager)
+# Install uv (fast Python package/deps manager) — pinned version for reproducibility
 ENV UV_INSTALL_DIR=/usr/local/bin
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+# See https://docs.astral.sh/uv/getting-started/installation/ for install flags
+ENV UV_VERSION=v0.4.27
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_VERSION=${UV_VERSION} sh
 
 # Performance: centralize caches and set common tool env vars
 ENV HOME=/home/${USERNAME} \
