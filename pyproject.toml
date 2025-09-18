@@ -113,3 +113,4 @@ warn_required_dynamic_aliases = true
 
 [tool.pytest.ini_options]
 addopts = ["-n", "auto", "--reruns", "3"]
+testpaths = ["unit_tests"]

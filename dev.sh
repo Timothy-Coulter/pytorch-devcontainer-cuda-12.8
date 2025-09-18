@@ -48,6 +48,10 @@ case "$cmd" in
     echo "[test] pytest (uses pyproject addopts)"
     pytest
     ;;
+  integration-tests)
+    echo "[integration-tests] pytest integration_tests (uses pyproject addopts)"
+    pytest integration_tests
+    ;;
   versions)
     echo "[versions] Python, torch, CUDA"
     python - <<'PY'
@@ -72,6 +76,7 @@ PY
     "$0" lint-fix
     "$0" typecheck
     "$0" test
+    "$0" integration-tests
     ;;
   *)
     usage
