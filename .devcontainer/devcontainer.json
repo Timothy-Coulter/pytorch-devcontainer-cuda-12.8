@@ -57,7 +57,9 @@
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
         "ms-toolsai.jupyter",
-        "gaogaotiantian.viztracer-vscode"
+        "gaogaotiantian.viztracer-vscode",
+        "openai.chatgpt",
+        "RooVeterinaryInc.roo-cline"
       ]
     }
   },
