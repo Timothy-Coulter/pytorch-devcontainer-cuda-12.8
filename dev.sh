@@ -29,29 +29,29 @@ fi
   case "$cmd" in
   format)
     echo "[format] ruff format, black, isort"
-    ruff format .
-    black .
-    isort .
+    uv run --with ruff,black,isort ruff format .
+    uv run --with black black .
+    uv run --with isort isort .
     ;;
   lint)
     echo "[lint] ruff check"
-    ruff check .
+    uv run --with ruff ruff check .
     ;;
   lint-fix)
     echo "[lint-fix] ruff check --fix"
-    ruff check --fix .
+    uv run --with ruff ruff check --fix .
     ;;
   typecheck)
     echo "[typecheck] mypy"
-    mypy .
+    uv run --with mypy mypy .
     ;;
   test)
     echo "[test] pytest (uses pyproject addopts)"
-    pytest
+    uv run --with pytest pytest
     ;;
   integration-tests)
     echo "[integration-tests] pytest integration_tests (uses pyproject addopts)"
-    pytest integration_tests
+    uv run --with pytest pytest integration_tests
     ;;
   versions)
     echo "[versions] Python, torch, CUDA"

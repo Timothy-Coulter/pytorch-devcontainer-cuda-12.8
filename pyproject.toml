@@ -114,5 +114,9 @@ init_typed = true
 warn_required_dynamic_aliases = true
 
 [tool.pytest.ini_options]
-addopts = ["-n", "auto", "--reruns", "3"]
-testpaths = ["tests"]
+addopts = [
+    "-n", "auto",                    # pytest-xdist: auto-detect number of workers
+    "--reruns", "3",                 # pytest-rerunfailures: retry failed tests 3 times
+    "--reruns-delay", "0.1"          # pytest-rerunfailures: 0.1 second delay between retries
+]
+testpaths = ["tests", "unit_tests"]
