@@ -42,6 +42,7 @@ dev = [
   "isort>=5.13.2",
   # Typing
   "mypy>=1.10.0",
+  "mypyc>=0.1.0",
   "types-requests",
   "types-PyYAML",
   # Tests
@@ -98,15 +99,31 @@ skip-magic-trailing-comma = false
 
 [tool.mypy]
 python_version = "3.12"
+
+# --- Performance settings ---
+incremental = true
+cache_dir = ".mypy_cache"
+follow_imports = "skip"
+follow_imports_for_stubs = true
+
+# Avoid analyzing huge ML libraries
+ignore_missing_imports = true
+
+# --- Strictness applied ONLY to your code ---
 strict = true
+disallow_untyped_defs = true
+disallow_any_generics = true
+no_implicit_reexport = true
+
+# --- Optional but safe warnings ---
 warn_unused_ignores = true
 warn_redundant_casts = true
 warn_return_any = true
 warn_unreachable = true
-disallow_untyped_defs = true
-disallow_any_generics = true
-no_implicit_reexport = true
+
+# --- Pydantic plugin ---
 plugins = ["pydantic.mypy"]
+
 
 [tool.pydantic-mypy]
 init_forbid_extra = true

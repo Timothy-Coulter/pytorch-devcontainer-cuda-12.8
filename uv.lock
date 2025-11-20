@@ -1141,6 +1141,12 @@ wheels = [
 ]
 
 [[package]]
+name = "mypyc"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/dd/65/108c4177b0d05d89ea61a373c463f59767e52ca547dd8c0a72ac7d4ca16e/mypyc-0.1.0.tar.gz", hash = "sha256:50e380015159a7786969cb6a5521bd8aa9703d2d3a36b1d1a49a0dd3a2519277", size = 1390, upload-time = "2025-09-29T00:02:05.619Z" }
+
+[[package]]
 name = "narwhals"
 version = "2.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1664,6 +1670,7 @@ dev = [
     { name = "black" },
     { name = "isort" },
     { name = "mypy" },
+    { name = "mypyc" },
     { name = "pytest" },
     { name = "pytest-rerunfailures" },
     { name = "pytest-xdist" },
@@ -1683,6 +1690,7 @@ requires-dist = [
     { name = "jupyterlab", specifier = ">=4.2" },
     { name = "matplotlib", specifier = ">=3.9" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.10.0" },
+    { name = "mypyc", marker = "extra == 'dev'", specifier = ">=0.1.0" },
     { name = "notebook", specifier = ">=7.0" },
     { name = "numpy", specifier = ">=1.26,<2" },
     { name = "pandas", specifier = ">=2.2,<2.3" },
