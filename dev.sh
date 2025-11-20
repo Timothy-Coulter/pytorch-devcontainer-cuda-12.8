@@ -14,6 +14,9 @@ Commands:
   all-checks   Format, lint-fix, typecheck, then tests
   versions     Print Python, Torch, and CUDA info
   clean        Remove caches and build artifacts
+  gpu-check    Check GPU availability
+  install      Install package in editable mode
+  jupyter      Opening Jupyter Lab
 
 Examples:
   ./dev.sh all-checks
@@ -95,4 +98,19 @@ PY
     usage
     exit 1
     ;;
+
+  gpu-check)
+      echo "[gpu-check] Checking GPU availability"
+      python -c "import torch; print(f'GPU Available: {torch.cuda.is_available()}'); print(f'GPU Count: {torch.cuda.device_count()}'); [print(f'GPU {i}: {torch.cuda.get_device_name(i)}') for i in range(torch.cuda.device_count())]"
+      ;;
+
+  install)
+      echo "[install] Installing package in editable mode"
+      uv pip install -e .
+      ;;
+
+  jupyter)
+      echo "[jupyter] Opening Jupyter Lab"
+      open http://localhost:8888
+      ;;
 esac
