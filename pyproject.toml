@@ -42,7 +42,6 @@ dev = [
   "isort>=5.13.2",
   # Typing
   "mypy>=1.10.0",
-  "mypyc>=0.1.0",
   "types-requests",
   "types-PyYAML",
   # Tests
