@@ -11,11 +11,30 @@ Prerequisites
 - VS Code + Dev Containers extension (or GitHub Codespaces)
  - Optional: host `~/.env` file with API keys and env vars (see below)
 
+- The following folders are created:
+  - If running in WSL (use powershell):
+    ```
+    wsl -d docker-desktop sh -c '
+    set -e
+    mkdir -p /mnt/wsl/Ubuntu/data/caches/{torch,huggingface} \
+              /mnt/wsl/Ubuntu/data/projects/pytorch-devcontainer-cuda-12.8/{data,datasets}
+    ln -sfn /mnt/wsl/Ubuntu/data /data
+    chown -R 1000:1000 /mnt/wsl/Ubuntu/data || true'
+    ```
+
+  - If running in Ubuntu:
+    ```
+    sudo mkdir -p /data/caches/{torch,huggingface} /data/projects/pytorch-devcontainer-cuda-12.8/{data,datasets}
+    sudo chown -R "$USER:$USER" /data/caches /data/projects
+    ```
+
+  - Note: replace the repo name if required.
+
 What you get
 ------------
 - Base image: `nvcr.io/nvidia/pytorch:25.08-py3` (Python 3.12, Torch from NGC 25.08, CUDA as provided by the image)
 - `uv` package manager, strict typing (mypy), ruff/black/isort
-- Useful caches mounted as volumes (pip, uv, torch, huggingface)
+- High-performance bind mounts for torch/huggingface caches and project data; pip/uv caches stay in container volumes (works in WSL via /mnt/wsl/<distro>/data or native Linux via /data)
 - GPU-enabled run args: `--gpus all --ipc host`
 - JupyterLab auto-starts on port 8888 (no token)
 - TensorBoard auto-starts on port 6006
@@ -75,9 +94,12 @@ Security
 
 Data and Caches
 ---------------
-- Caches are persisted via named volumes: pip, uv, torch, huggingface
-- Local datasets folder is bind-mounted into `/workspaces/<repo>/datasets`
-- Add your own data under `datasets/` or use the mounted `data/` volume
+- Host layout (WSL/Ubuntu): `/data/caches/{torch,huggingface}` and `/data/projects/<repo>/{data,datasets}`. For WSL, the Docker daemon sees these under `/mnt/wsl/$WSL_DISTRO_NAME/data/...`, so the binds point there. The `initializeCommand` creates both `/mnt/wsl/$WSL_DISTRO_NAME/data/...` and `/data/...` best-effort.
+- Container mounts: pip/uv caches stay in named volumes; torch/huggingface caches bind to `/home/vscode/.cache/{torch,huggingface}` from the host; datasets bind to `/datasets`; project data binds to `/data`.
+- Works without host binds: if the host paths are missing, you can still use repo-local `./datasets` and `./data` under `/workspaces/<repo>`. In code, use `os.path.isdir("/datasets")` to choose between `/datasets` and `./datasets`.
+- WSL host prep (one-time): `sudo mkdir -p /data/caches/{torch,huggingface} /data/projects/<repo>/{data,datasets} && sudo chown -R "$USER:$USER" /data/caches /data/projects` (the Docker daemon consumes them via `/mnt/wsl/$WSL_DISTRO_NAME/data/...`).
+- Native Linux host prep (one-time): ensure `/data/caches/{torch,huggingface}` and `/data/projects/<repo>/{data,datasets}` exist and are writable by your user.
+
 
 Environment Variables (.env)
 ----------------------------
