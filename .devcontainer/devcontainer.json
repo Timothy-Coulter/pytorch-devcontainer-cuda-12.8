@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
   "name": "PyTorch DevContainer — NGC 25.08",
-  "initializeCommand": "bash -lc 'bash .devcontainer/init-host-paths.sh \"${localWorkspaceFolderBasename}\" && mkdir -p .devcontainer && if [ -f \"$HOME/.env\" ]; then cp \"$HOME/.env\" .devcontainer/.env.devcontainer; else : > .devcontainer/.env.devcontainer; fi'",
+  "initializeCommand": "bash -lc 'mkdir -p .devcontainer; if [ -f \"$HOME/.env\" ]; then cp \"$HOME/.env\" .devcontainer/.env.devcontainer; else : > .devcontainer/.env.devcontainer; fi'",
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."
@@ -33,14 +33,14 @@
     }
   },
   "mounts": [
-    // pip/uv stay in container volumes for performance
+    // Caches (named volumes for speed & persistence)
     "type=volume,source=${localWorkspaceFolderBasename}-pip-cache,target=/home/vscode/.cache/pip",
     "type=volume,source=${localWorkspaceFolderBasename}-uv-cache,target=/home/vscode/.cache/uv",
-    // High-performance host binds (WSL-aware: docker-desktop sees /mnt/wsl/<distro>/...)
-    "type=bind,source=/mnt/wsl/${localEnv:WSL_DISTRO_NAME}/data/caches/torch,target=/home/vscode/.cache/torch",
-    "type=bind,source=/mnt/wsl/${localEnv:WSL_DISTRO_NAME}/data/caches/huggingface,target=/home/vscode/.cache/huggingface",
-    "type=bind,source=/mnt/wsl/${localEnv:WSL_DISTRO_NAME}/data/projects/${localWorkspaceFolderBasename}/datasets,target=/datasets",
-    "type=bind,source=/mnt/wsl/${localEnv:WSL_DISTRO_NAME}/data/projects/${localWorkspaceFolderBasename}/data,target=/data"
+    "type=volume,source=${localWorkspaceFolderBasename}-torch-cache,target=/home/vscode/.cache/torch",
+    "type=volume,source=${localWorkspaceFolderBasename}-hf-cache,target=/home/vscode/.cache/huggingface",
+    // Data & datasets (use volumes by default so Clone-in-Container-Volume works)
+    "type=volume,source=${localWorkspaceFolderBasename}-datasets,target=/workspaces/${localWorkspaceFolderBasename}/datasets",
+    "type=volume,source=${localWorkspaceFolderBasename}-data,target=/workspaces/${localWorkspaceFolderBasename}/data"
   ],
   "containerEnv": {
     "NVIDIA_VISIBLE_DEVICES": "all",
