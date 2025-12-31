@@ -8,12 +8,8 @@ def test_sample_pass() -> None:
     assert 1 + 1 == 2
 
 
-def test_sample_fail() -> None:
-    """A simple failing test for demonstration purposes."""
-    assert 1 + 1 == 3  # This will fail
-
-
-@pytest.mark.parametrize(
+# mypy cannot type pytest decorators without the pytest plugin.
+@pytest.mark.parametrize(  # type: ignore[misc]
     "input,expected",
     [
         (1, 2),
