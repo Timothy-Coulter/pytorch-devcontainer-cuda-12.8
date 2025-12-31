@@ -15,7 +15,7 @@ What you get
 ------------
 - Base image: `nvcr.io/nvidia/pytorch:25.08-py3` (Python 3.12, Torch from NGC 25.08, CUDA as provided by the image)
 - `uv` package manager, strict typing (mypy), ruff/black/isort
-- Useful caches mounted as volumes (pip, uv, torch, huggingface)
+- High-performance bind mounts for torch/huggingface caches and project data under `/data` on WSL/Ubuntu hosts (pip/uv caches stay in fast container volumes; still works when cloning into a Docker volume)
 - GPU-enabled run args: `--gpus all --ipc host`
 - JupyterLab auto-starts on port 8888 (no token)
 - TensorBoard auto-starts on port 6006
@@ -75,9 +75,9 @@ Security
 
 Data and Caches
 ---------------
-- Caches are persisted via named volumes: pip, uv, torch, huggingface
-- Local datasets folder is bind-mounted into `/workspaces/<repo>/datasets`
-- Add your own data under `datasets/` or use the mounted `data/` volume
+- Host layout (WSL/Ubuntu): `/data/caches/{torch,huggingface}` and `/data/projects/<repo>/{data,datasets}`. `initializeCommand` creates these paths on the host so bind mounts work whether you open a local folder or clone directly into a Docker volume.
+- Container mounts: pip/uv caches stay in named volumes; torch/huggingface caches bind to `/home/vscode/.cache/{torch,huggingface}` from the host; datasets bind to `/datasets`; project data binds to `/data`.
+- Works without `/data`: if the host does not provide `/data` (e.g., fresh clone-in-container-volume, CI), the container still starts. You can keep using the repo-local `./datasets` and `./data` under `/workspaces/<repo>`. In code, prefer checks like `os.path.isdir("/datasets")` to decide between `/datasets` and `./datasets`.
 
 Environment Variables (.env)
 ----------------------------

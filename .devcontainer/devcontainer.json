@@ -1,7 +1,26 @@
 {
   "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
   "name": "PyTorch DevContainer — NGC 25.08",
-  "initializeCommand": "bash -lc 'mkdir -p .devcontainer; if [ -f \"$HOME/.env\" ]; then cp \"$HOME/.env\" .devcontainer/.env.devcontainer; else : > .devcontainer/.env.devcontainer; fi'",
+  "initializeCommand": "bash -lc '\
+    set -e; \
+    REPO=${localWorkspaceFolderBasename}; \
+    mkdir -p .devcontainer; \
+    if [ -f \"$HOME/.env\" ]; then cp \"$HOME/.env\" .devcontainer/.env.devcontainer; else : > .devcontainer/.env.devcontainer; fi; \
+    create_host_path() { \
+      mkdir -p \"$1\" 2>/dev/null && return 0; \
+      if command -v sudo >/dev/null 2>&1; then \
+        sudo -n mkdir -p \"$1\" 2>/dev/null && return 0; \
+      fi; \
+      echo \"[devcontainer] Warning: could not create $1 (check permissions)\" >&2; \
+    }; \
+    for path in \
+      /data/caches/torch \
+      /data/caches/huggingface \
+      /data/projects/${REPO}/data \
+      /data/projects/${REPO}/datasets; do \
+      create_host_path \"$path\"; \
+    done \
+  '",
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."
@@ -30,14 +49,13 @@
     }
   },
   "mounts": [
-    // Caches (named volumes for speed & persistence)
+    // Caches: pip/uv stay in container volumes; torch/hf use host bind mounts if available
     "type=volume,source=${localWorkspaceFolderBasename}-pip-cache,target=/home/vscode/.cache/pip",
     "type=volume,source=${localWorkspaceFolderBasename}-uv-cache,target=/home/vscode/.cache/uv",
-    "type=volume,source=${localWorkspaceFolderBasename}-torch-cache,target=/home/vscode/.cache/torch",
-    "type=volume,source=${localWorkspaceFolderBasename}-hf-cache,target=/home/vscode/.cache/huggingface",
-    // Data & datasets (use volumes by default so Clone-in-Container-Volume works)
-    "type=volume,source=${localWorkspaceFolderBasename}-datasets,target=/workspaces/${localWorkspaceFolderBasename}/datasets",
-    "type=volume,source=${localWorkspaceFolderBasename}-data,target=/workspaces/${localWorkspaceFolderBasename}/data"
+    "type=bind,source=/data/caches/torch,target=/home/vscode/.cache/torch",
+    "type=bind,source=/data/caches/huggingface,target=/home/vscode/.cache/huggingface",
+    "type=bind,source=/data/projects/${localWorkspaceFolderBasename}/datasets,target=/datasets",
+    "type=bind,source=/data/projects/${localWorkspaceFolderBasename}/data,target=/data"
   ],
   "containerEnv": {
     "NVIDIA_VISIBLE_DEVICES": "all",
