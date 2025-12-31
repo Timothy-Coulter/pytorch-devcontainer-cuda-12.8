@@ -1,34 +1,34 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_NAME="${1:-}"
-if [ -z "${REPO_NAME}" ]; then
-  echo "[devcontainer] Repository name argument required" >&2
-  exit 1
+repo="${1:-$(basename "${PWD}")}"
+
+# Pick a writable root. Prefer WSL ext4 if present, else /data on native Linux.
+host_root="/data"
+if [ -n "${WSL_DISTRO_NAME:-}" ] && [ -d "/mnt/wsl/${WSL_DISTRO_NAME}" ]; then
+  host_root="/mnt/wsl/${WSL_DISTRO_NAME}/data"
+elif [ -d /mnt/wsl/Ubuntu ]; then
+  host_root="/mnt/wsl/Ubuntu/data"
 fi
 
-mkdir -p .devcontainer
-if [ -f "$HOME/.env" ]; then
-  cp "$HOME/.env" .devcontainer/.env.devcontainer
-else
-  : > .devcontainer/.env.devcontainer
+# Use sudo if available; otherwise run plain (e.g., docker-desktop already root).
+SUDO=""
+if command -v sudo >/dev/null 2>&1; then
+  SUDO="sudo"
 fi
 
-create_host_path() {
-  mkdir -p "$1" 2>/dev/null && return 0
-  if command -v sudo >/dev/null 2>&1; then
-    sudo -n mkdir -p "$1" 2>/dev/null && return 0
-  fi
-  echo "[devcontainer] Warning: could not create $1 (check permissions)" >&2
-}
+# If we’re on WSL and /data isn’t the same tree, make /data point at the WSL-backed path.
+if [ "${host_root}" != "/data" ] && [ ! -e /data ]; then
+  ${SUDO} ln -sfn "${host_root}" /data
+fi
 
-# Primary root for WSL (visible to docker-desktop) and fallback for native Linux
-WSL_ROOT="/mnt/wsl/${WSL_DISTRO_NAME:-Ubuntu}/data"
-NATIVE_ROOT="/data"
+${SUDO} mkdir -p \
+  "${host_root}/caches/torch" \
+  "${host_root}/caches/huggingface" \
+  "${host_root}/projects/${repo}/data" \
+  "${host_root}/projects/${repo}/datasets"
 
-for root in "$WSL_ROOT" "$NATIVE_ROOT"; do
-  create_host_path "${root}/caches/torch"
-  create_host_path "${root}/caches/huggingface"
-  create_host_path "${root}/projects/${REPO_NAME}/data"
-  create_host_path "${root}/projects/${REPO_NAME}/datasets"
-done
+# Best-effort ownership fix to UID/GID of the current user (or the sudo caller).
+uid="${SUDO_UID:-$(id -u)}"
+gid="${SUDO_GID:-$(id -g)}"
+${SUDO} chown -R "${uid}:${gid}" "${host_root}/caches" "${host_root}/projects/${repo}" || true

@@ -12,17 +12,19 @@ Prerequisites
  - Optional: host `~/.env` file with API keys and env vars (see below)
 
 - The following folders are created:
-  - If running in WSL:
+  - If running in WSL (use powershell):
     ```
-    sudo mkdir -p /data/caches/{torch,huggingface} \
-             /data/projects/pytorch-devcontainer-cuda-12.8/{data,datasets}
-    sudo chown -R "$USER:$USER" /data/caches /data/projects
+    wsl -d docker-desktop sh -c '
+    set -e
+    mkdir -p /mnt/wsl/Ubuntu/data/caches/{torch,huggingface} \
+              /mnt/wsl/Ubuntu/data/projects/pytorch-devcontainer-cuda-12.8/{data,datasets}
+    ln -sfn /mnt/wsl/Ubuntu/data /data
+    chown -R 1000:1000 /mnt/wsl/Ubuntu/data || true'
     ```
 
   - If running in Ubuntu:
     ```
-    sudo mkdir -p /data/caches/{torch,huggingface} \
-             /data/projects/pytorch-devcontainer-cuda-12.8/{data,datasets}
+    sudo mkdir -p /data/caches/{torch,huggingface} /data/projects/pytorch-devcontainer-cuda-12.8/{data,datasets}
     sudo chown -R "$USER:$USER" /data/caches /data/projects
     ```
 
