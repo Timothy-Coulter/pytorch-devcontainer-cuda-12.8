@@ -18,7 +18,10 @@
   ],
   "containerUser": "vscode",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "forwardPorts": [8888, 6006],
+  "forwardPorts": [
+    8888,
+    6006
+  ],
   "portsAttributes": {
     "8888": {
       "label": "Jupyter Lab",
@@ -30,13 +33,14 @@
     }
   },
   "mounts": [
-    // Caches: pip/uv stay in container volumes; torch/hf use host bind mounts if available
+    // pip/uv stay in container volumes for performance
     "type=volume,source=${localWorkspaceFolderBasename}-pip-cache,target=/home/vscode/.cache/pip",
     "type=volume,source=${localWorkspaceFolderBasename}-uv-cache,target=/home/vscode/.cache/uv",
-    "type=bind,source=/data/caches/torch,target=/home/vscode/.cache/torch",
-    "type=bind,source=/data/caches/huggingface,target=/home/vscode/.cache/huggingface",
-    "type=bind,source=/data/projects/${localWorkspaceFolderBasename}/datasets,target=/datasets",
-    "type=bind,source=/data/projects/${localWorkspaceFolderBasename}/data,target=/data"
+    // High-performance host binds (WSL-aware: docker-desktop sees /mnt/wsl/<distro>/...)
+    "type=bind,source=/mnt/wsl/${localEnv:WSL_DISTRO_NAME}/data/caches/torch,target=/home/vscode/.cache/torch",
+    "type=bind,source=/mnt/wsl/${localEnv:WSL_DISTRO_NAME}/data/caches/huggingface,target=/home/vscode/.cache/huggingface",
+    "type=bind,source=/mnt/wsl/${localEnv:WSL_DISTRO_NAME}/data/projects/${localWorkspaceFolderBasename}/datasets,target=/datasets",
+    "type=bind,source=/mnt/wsl/${localEnv:WSL_DISTRO_NAME}/data/projects/${localWorkspaceFolderBasename}/data,target=/data"
   ],
   "containerEnv": {
     "NVIDIA_VISIBLE_DEVICES": "all",

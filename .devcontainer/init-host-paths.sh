@@ -22,10 +22,13 @@ create_host_path() {
   echo "[devcontainer] Warning: could not create $1 (check permissions)" >&2
 }
 
-for path in \
-  /data/caches/torch \
-  /data/caches/huggingface \
-  /data/projects/${REPO_NAME}/data \
-  /data/projects/${REPO_NAME}/datasets; do
-  create_host_path "$path"
+# Primary root for WSL (visible to docker-desktop) and fallback for native Linux
+WSL_ROOT="/mnt/wsl/${WSL_DISTRO_NAME:-Ubuntu}/data"
+NATIVE_ROOT="/data"
+
+for root in "$WSL_ROOT" "$NATIVE_ROOT"; do
+  create_host_path "${root}/caches/torch"
+  create_host_path "${root}/caches/huggingface"
+  create_host_path "${root}/projects/${REPO_NAME}/data"
+  create_host_path "${root}/projects/${REPO_NAME}/datasets"
 done
