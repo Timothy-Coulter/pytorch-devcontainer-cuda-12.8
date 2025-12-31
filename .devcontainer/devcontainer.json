@@ -1,26 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
   "name": "PyTorch DevContainer — NGC 25.08",
-  "initializeCommand": "bash -lc '\
-    set -e; \
-    REPO=${localWorkspaceFolderBasename}; \
-    mkdir -p .devcontainer; \
-    if [ -f \"$HOME/.env\" ]; then cp \"$HOME/.env\" .devcontainer/.env.devcontainer; else : > .devcontainer/.env.devcontainer; fi; \
-    create_host_path() { \
-      mkdir -p \"$1\" 2>/dev/null && return 0; \
-      if command -v sudo >/dev/null 2>&1; then \
-        sudo -n mkdir -p \"$1\" 2>/dev/null && return 0; \
-      fi; \
-      echo \"[devcontainer] Warning: could not create $1 (check permissions)\" >&2; \
-    }; \
-    for path in \
-      /data/caches/torch \
-      /data/caches/huggingface \
-      /data/projects/${REPO}/data \
-      /data/projects/${REPO}/datasets; do \
-      create_host_path \"$path\"; \
-    done \
-  '",
+  "initializeCommand": "bash -lc 'bash .devcontainer/init-host-paths.sh \"${localWorkspaceFolderBasename}\"'",
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."
